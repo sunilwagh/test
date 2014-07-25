@@ -1,0 +1,151 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation=" http://www.springframework.org/schema/beans
+  http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/aop  
+  http://www.springframework.org/schema/aop/spring-aop.xsd 
+  http://www.springframework.org/schema/beans 
+  http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/tx 
+  http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+  http://www.springframework.org/schema/context 
+  http://www.springframework.org/schema/context/spring-context.xsd
+  http://www.springframework.org/schema/mvc
+  http://www.springframework.org/schema/mvc/spring-mvc.xsd
+">
+
+
+	<context:component-scan
+		base-package="src.main.java.com.nbcuni.news.taxonomy.controller" />
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:application.properties</value>
+				<value>classpath:version.json</value>
+				<value>classpath:test.csv</value>
+
+			</list>
+		</property>
+	</bean>
+
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<bean
+				class="src.main.java.com.nbcuni.news.taxonomy.http.converter.json.DefaultJacksonHttpMessageConverter">
+				<!-- True only for the blog article - a production system would set this 
+					to false to reduce the number of bytes sent across the wire: -->
+				<property name="prettyPrint" value="true" />
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+
+	<mvc:interceptors>
+		<bean id="localeChangeInterceptor"
+			class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			<property name="paramName" value="lang" />
+		</bean>
+	</mvc:interceptors>
+
+
+	<bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver" />
+
+	<!-- Unfortunately we have to repeat an instance of this class here because 
+		the mvc:message-converters element above does not support <ref/> elements: -->
+	<bean id="jacksonHttpMessageConverter"
+		class="src.main.java.com.nbcuni.news.taxonomy.http.converter.json.DefaultJacksonHttpMessageConverter">
+		<property name="prettyPrint" value="true" />
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="order" value="1" />
+		<property name="mediaTypes">
+			<map>
+				<entry key="json" value="application/json" />
+			</map>
+		</property>
+		<property name="defaultContentType"
+			value="#{T(org.springframework.http.MediaType).APPLICATION_JSON}" />
+		<property name="defaultViews">
+			<list>
+				<bean
+					class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- Allow Exceptions to be handled in annotated methods if desired. Otherwise 
+		fallback to the 'restExceptionResolver' below: -->
+	<bean id="annotationMethodHandlerExceptionResolver"
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver">
+		<property name="order" value="0" />
+	</bean>
+
+	<bean id="restExceptionResolver"
+		class="src.main.java.com.nbcuni.news.taxonomy.exception.RestExceptionHandler">
+		<property name="order" value="100" />
+		<property name="messageConverters">
+			<list>
+				<ref bean="jacksonHttpMessageConverter" />
+			</list>
+		</property>
+		<property name="errorResolver">
+			<bean
+				class="src.main.java.com.nbcuni.news.taxonomy.exception.DefaultRestErrorResolver">
+				<property name="localeResolver" ref="localeResolver" />
+				<property name="defaultMoreInfoUrl" value="sunil.wagh@nbcuni.com" />
+				<property name="exceptionMappingDefinitions">
+					<map>
+						<!-- 404 -->
+						<entry
+							key="src.main.java.com.nbcuni.news.taxonomy.exception.UnknownResourceException"
+							value="404, _exmsg" />
+
+						<!-- 500 (catch all): -->
+						<entry key="Throwable" value="500" />
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="csvreader" class="src.main.java.com.nbcuni.news.taxonomy.csv.CSVReader"
+		init-method="readFromFile">
+		<property name="fileResource" value="test.csv" />
+	</bean>
+
+	<bean id="getVersionResponse"
+		class="src.main.java.com.nbcuni.news.taxonomy.responses.GetVersionResponse">
+		<property name="version" value="${version}" />
+		<property name="date" value="${date}" />
+	</bean>
+
+
+	<!-- the ResourceBundleViewResolver -->
+	<!-- <bean id="viewResolver" class="org.springframework.web.servlet.view.ResourceBundleViewResolver"> 
+		<property name="basename" value="views"/> </bean> -->
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix">
+			<value>/WEB-INF/pages/</value>
+		</property>
+		<property name="suffix">
+			<value>.json</value>
+		</property>
+	</bean>
+
+
+
+
+
+
+
+
+
+</beans>

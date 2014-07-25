@@ -1,0 +1,8 @@
+NewsCms/PrimarySection/News,News,Unified/News,news
+NewsCms/PrimaryTopic/Weather,Weather,Unified/Weather,weather
+NewsCms/PrimarySection/Science,Science,Unified/Science,science
+NewsCms/PrimaryTopic/Space,Space,Unified/Science/Space,space
+NewsCms/PrimarySection/Health,Health,Unified/Health,health
+NewsCms/PrimaryTopic/Health news,Health News,Unified/Health/Health News,health-news
+NewsCms/Topic/U.S. News,U.S. News,Unified/News/U.S. News,us-news
+NewsCms/Topic/Photo,Photos,Unified/News/Photos,photos

@@ -1,0 +1,39 @@
+<web-app>
+<filter> 
+   <filter-name>springCharacterEncodingFilter</filter-name>
+   <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+   <init-param>
+     <param-name>encoding</param-name>
+     <param-value>UTF-8</param-value>
+   </init-param>
+   <init-param>
+     <param-name>forceEncoding</param-name>
+     <param-value>true</param-value>
+   </init-param>
+</filter>
+ 
+ <filter-mapping>
+   <filter-name>springCharacterEncodingFilter</filter-name>
+   <url-pattern>/*</url-pattern>
+ </filter-mapping>
+    
+    
+    <display-name>Taxonomy Service</display-name>
+    
+    <servlet>
+        <servlet-name>rest</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>rest</servlet-name>
+         <!-- e.g. http://localhost:8080/x.y.z-SNAPSHOT/ : -->
+         <!-- <url-pattern>/${version}/*</url-pattern>-->
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    
+    
+ 
+    
+</web-app>
